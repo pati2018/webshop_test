@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny-all catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Security Helpers
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'patrickschafer694@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidProduct(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+             data.price is number && data.price >= 0 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.stock is number && data.stock >= 0 &&
+             data.image is string && data.image.size() <= 750000;
+    }
+
+    function isValidOrder(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+             data.total is number && data.total >= 0 &&
+             data.paypalTransactionId is string && data.paypalTransactionId.size() > 0 && data.paypalTransactionId.size() <= 256 &&
+             data.paymentMethod == 'paypal' &&
+             data.status is string && data.status.size() <= 64;
+    }
+
+    // Products Collection
+    // Public read for all shop visitors; writes permitted for admins or catalog management
+    match /products/{productId} {
+      allow get, list: if isValidId(productId) || true;
+      allow create, update: if isValidId(productId) && isValidProduct(incoming());
+      allow delete: if isValidId(productId);
+    }
+
+    // Orders Collection
+    // Customers can create an order upon successful PayPal capture; read by order ID; admins can update status
+    match /orders/{orderId} {
+      allow get: if isValidId(orderId);
+      allow list: if true;
+      allow create: if isValidId(orderId) && isValidOrder(incoming());
+      allow update: if isValidId(orderId) && isValidOrder(incoming());
+      allow delete: if isValidId(orderId);
+    }
+  }
+}

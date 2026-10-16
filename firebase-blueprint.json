@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A purchasable design object in the KONTUR webshop catalog.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the product" },
+        "name": { "type": "string", "description": "Product name" },
+        "subtitle": { "type": "string", "description": "Short marketing description" },
+        "price": { "type": "number", "description": "Price in EUR including VAT" },
+        "category": { "type": "string", "description": "Category: Audio & Akustik, Raum & Licht, or Living & Wohlbefinden" },
+        "image": { "type": "string", "description": "Product image URL or asset path" },
+        "rating": { "type": "number", "description": "Customer average rating" },
+        "reviewCount": { "type": "number", "description": "Number of customer reviews" },
+        "stock": { "type": "number", "description": "Current inventory count" },
+        "badge": { "type": "string", "description": "Optional badge such as Bestseller, Neu, Design Award" },
+        "description": { "type": "string", "description": "In-depth description of materials and features" },
+        "highlights": { "type": "array", "description": "Bullet points with key benefits" },
+        "specs": { "type": "array", "description": "Technical specifications" },
+        "variants": { "type": "array", "description": "Available color/style variants" },
+        "careInstructions": { "type": "string", "description": "Cleaning and care instructions" },
+        "shippingInfo": { "type": "string", "description": "Shipping and packaging info" }
+      },
+      "required": ["id", "name", "price", "category", "image", "stock"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order paid via PayPal.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Order reference code, e.g. #KTR-2026-XXXX" },
+        "date": { "type": "string", "description": "Date and time of purchase" },
+        "items": { "type": "array", "description": "Purchased items with quantity and chosen variant" },
+        "subtotal": { "type": "number", "description": "Subtotal before discount and shipping" },
+        "discount": { "type": "number", "description": "Applied discount amount" },
+        "shippingCost": { "type": "number", "description": "Shipping fee" },
+        "total": { "type": "number", "description": "Final paid amount in EUR" },
+        "shippingMethod": { "type": "string", "description": "standard or express" },
+        "shippingAddress": { "type": "object", "description": "Customer delivery details" },
+        "paymentMethod": { "type": "string", "description": "paypal" },
+        "paypalTransactionId": { "type": "string", "description": "PayPal transaction ID from payment capture" },
+        "status": { "type": "string", "description": "Order status: Bezahlt, In Bearbeitung, Versendet" }
+      },
+      "required": ["id", "date", "items", "subtotal", "total", "shippingAddress", "paymentMethod", "paypalTransactionId", "status"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Catalog of available products in the webshop."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders with PayPal transaction references."
+    }
+  }
+}

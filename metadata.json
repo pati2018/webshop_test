@@ -1,0 +1,7 @@
+{
+  "name": "KONTUR Studio Webshop",
+  "description": "Minimalistischer Webshop mit kuratierten Design-Produkten, Warenkorb, Wunschliste, Bestellhistorie und nahtloser PayPal-Bezahlung.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
